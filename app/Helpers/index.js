@@ -22,8 +22,19 @@ export function getCellZero(grid) {
         }
     }
 
-    return {
-        x: -1,
-        y: -1
-    };
+    return null;
+}
+
+export function isGameover(grid) {
+    const dimension = grid.length;
+    
+    for (let i = 0, n = 0; i < dimension; ++i) {
+        for (let j = 0; j < dimension; ++j, ++n) {
+            if (grid[i][j] != n) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }

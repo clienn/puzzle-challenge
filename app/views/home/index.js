@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { GET_PUZZLE_REQUEST } from '../../models/puzzle/actions';
 import PuzzleGrid from './components/PuzzleGrid';
@@ -24,18 +24,39 @@ const mapDispatchToProps = (dispatch, props) => ({
     }
 });
 
-const HomeView = ({ grid, moves, isComplete, getPuzzle }) => {
+const HomeView = ({ moves, isComplete, getPuzzle }) => {
     useEffect(() => {
         getPuzzle();
     }, []);
 
+    const reset = () => {
+        getPuzzle();
+    }
+
     return (
         <View>
-            <Text>{ moves }</Text>
+            <Text style={ styles.textDisplay }>Moves: { moves }</Text>
+
+            { 
+                isComplete && 
+                <Button
+                    title="Play Again"
+                    buttonStyle={styles.button}
+                    onPress={() => reset() }
+                />
+            }
+                
             <PuzzleGrid />
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    textDisplay: {
+        padding: 20,
+        fontSize: 25,
+    }
+});
 
 const Home = connect(
     mapStateToProps,

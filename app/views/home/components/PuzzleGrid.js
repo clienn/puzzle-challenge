@@ -3,11 +3,11 @@ import {
     View, 
     Text, 
     StyleSheet, 
-    TouchableWithoutFeedback, 
-    Animated 
+    TouchableWithoutFeedback,
+    Alert, 
 } from 'react-native';
 import { connect } from 'react-redux';
-import { getCellZero } from '../../../Helpers/index';
+import { getCellZero, isGameover } from '../../../Helpers/index';
 import { GET_PUZZLE_REQUEST } from '../../../models/puzzle/actions';
 
 const mapStateToProps = (state, props) => {
@@ -26,14 +26,14 @@ const mapDispatchToProps = (dispatch, props) => ({
 });
 
 const PuzzleView = ({ grid, moves, isComplete, updatePuzzle }) => {
-    const [cellZero, setCellZero] = useState(getCellZero(grid));
+    const [cellZero, setCellZero] = useState(null);
 
     useEffect(() => {
         setCellZero(getCellZero(grid));
-    }, []);
+    }, [grid]);
 
     const move = (x, y) => {
-        if (x > -1 && y > -1) {
+        if (!isComplete && cellZero) {
             const zx = cellZero.x;
             const zy = cellZero.y;
 
@@ -44,16 +44,19 @@ const PuzzleView = ({ grid, moves, isComplete, updatePuzzle }) => {
                 const newGrid = [...grid];
                 [newGrid[y][x], newGrid[zy][zx]] = [newGrid[zy][zx], newGrid[y][x]];
 
-                setCellZero({
-                    x: x,
-                    y: y
-                });
+                setCellZero({ x, y });
+
+                const gameover = isGameover(newGrid);
 
                 updatePuzzle({
                     grid: newGrid,
                     moves: moves + 1,
-                    isComplete: isComplete,
+                    isComplete: gameover,
                 });
+
+                if (gameover) {
+                    Alert.alert('You win!');
+                }
             }
         }
     }
@@ -63,15 +66,14 @@ const PuzzleView = ({ grid, moves, isComplete, updatePuzzle }) => {
             { grid.map((row, i) => (
             <View style={[styles.container, { flexDirection: "row" }]} key={ i }>
                 { row.map((n, j) => (
-                <TouchableWithoutFeedback onPress={() => { move(j, i); }} key={ n }>
-                    <Animated.View style={ [n ? styles.cell : styles.zeroCell] }>
-                        <Text style={n ? styles.cellFont : styles.zeroCellFont }>{ n }</Text>
-                    </Animated.View>
+                <TouchableWithoutFeedback onPress={() => { move(j, i) }} key={ n }>
+                    <View style={ [n ? styles.cell : styles.zeroCell] }>
+                        <Text style={n ? styles.cellFont : styles.zeroCellFont }>{ n ? n : '' }</Text>
+                    </View>
                 </TouchableWithoutFeedback>
                 ))}
             </View>
             ))}
-
         </View>
     );
 }
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
   
     cell: {
       flex: 3,
-      backgroundColor: "#eaeaea",
+      backgroundColor: "#eee4da",
       aspectRatio: 1,
       margin: 1,
       alignItems: 'center',
@@ -97,7 +99,9 @@ const styles = StyleSheet.create({
     },
   
     cellFont: {
-      color: '#000'
+      color: '#776e65',
+      fontSize: 15,
+      fontWeight: 'bold'
     },
   
     zeroCell: {
@@ -111,9 +115,9 @@ const styles = StyleSheet.create({
     },
   
     zeroCellFont: {
-      color: '#fff'
+      color: '#f8f8f8'
     }
-  });
+});
 
 const PuzzleGrid = connect(
     mapStateToProps,

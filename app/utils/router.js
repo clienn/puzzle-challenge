@@ -3,9 +3,10 @@ import { createAppContainer } from 'react-navigation';
 import { Home } from '../views/home';
 
 const MainStack = createStackNavigator({
-    Home: {
+    "Puzzle Challenge": {
         screen: Home,
-    }
+    },
+
 });
 
 const Navigation = createAppContainer(MainStack);

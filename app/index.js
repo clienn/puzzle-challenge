@@ -5,7 +5,7 @@ import { Navigation } from './utils/router';
 const App = ({}) => {
     return (
         <View style={{ flex: 1, flexDirection: 'column' }}>
-            <Navigation />
+            <Navigation options={{ title: 'My home' }} />
         </View>
     );
 };
